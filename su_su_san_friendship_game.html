@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#dff7e9">
+<title>Su Su San — How Well Do You Know Me?</title>
+<style>
+:root{--mint:#dff7e9;--mint2:#bdebd2;--green:#39785c;--dark:#244b3a;--cream:#fffdf7;--pink:#ffe4ec}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(145deg,#effff5,#e3f5ff 55%,#fff0f5);color:var(--dark);padding:20px;display:flex;align-items:center;justify-content:center}
+.wrap{width:100%;max-width:560px}
+.card{background:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.9);border-radius:28px;padding:25px;box-shadow:0 16px 45px #47765a20}
+.top{text-align:center}
+.emoji{font-size:45px}
+h1{font-size:clamp(25px,6vw,35px);margin:8px 0;color:#39785c}
+.sub{line-height:1.65;color:#557765;margin:0 0 20px}
+.pill{display:inline-block;background:#e6f8ed;border-radius:999px;padding:7px 13px;font-size:13px;margin:4px}
+button{font:inherit;border:0;cursor:pointer;transition:transform .12s,filter .12s}
+button:active{transform:scale(.98)}
+.primary{width:100%;padding:15px 18px;border-radius:16px;background:#4f9b75;color:white;font-weight:700;box-shadow:0 6px 0 #347452;margin-top:10px}
+.primary:hover{filter:brightness(1.04)}
+.secondary{padding:11px 15px;border-radius:13px;background:#eef8f1;color:#39785c;font-weight:600}
+.hidden{display:none!important}
+.progressrow{display:flex;justify-content:space-between;font-size:13px;color:#63816f;margin-bottom:9px}
+.track{height:8px;border-radius:99px;background:#e8f2eb;overflow:hidden;margin-bottom:22px}
+.fill{height:100%;width:0;background:#68b98b;border-radius:99px;transition:width .25s}
+.question{font-size:21px;line-height:1.5;margin:0 0 17px}
+.options{display:grid;gap:10px}
+.option{width:100%;text-align:left;padding:14px 15px;border-radius:15px;border:1.5px solid #dcefe2;background:#fff;color:#355d47;line-height:1.4}
+.option:hover{background:#f0fbf4;border-color:#82c9a0}
+.option.selected{background:#e1f7e9;border-color:#4f9b75;font-weight:700}
+.feedback{margin-top:14px;padding:12px;border-radius:13px;background:#fff4d9;color:#775c23;line-height:1.5}
+.footer{text-align:center;font-size:12px;color:#81978a;margin-top:17px;line-height:1.5}
+.resultscore{font-size:52px;font-weight:800;color:#4f9b75;margin:5px}
+.resulttitle{font-size:24px;font-weight:800;margin:8px}
+.resulttext{line-height:1.7;color:#557765}
+.nameinput{width:100%;padding:14px;border:1.5px solid #dcefe2;border-radius:14px;font:inherit;margin:8px 0 4px;outline:none}
+.nameinput:focus{border-color:#68b98b}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="card" id="welcome">
+  <div class="top">
+    <div class="emoji">🍀💌</div>
+    <span class="pill">A tiny friendship game</span>
+    <h1>Su Su San ရေ… 👀</h1>
+    <p class="sub">ငါ့အကြောင်း ဘယ်လောက်သိလဲ စမ်းကြည့်ရအောင်။<br>မေးခွန်းလေးတွေဖြေပြီး မင်းရဲ့ <b>Friendship Score</b> ကိုကြည့်လိုက် 💚</p>
+  </div>
+  <label for="player" style="font-size:14px;color:#557765">မင်းနာမည် (မဖြည့်လည်းရတယ်)</label>
+  <input class="nameinput" id="player" placeholder="နာမည်လေးရေးခဲ့ပါ…" maxlength="30">
+  <button class="primary" id="start">ဂိမ်းစမယ် ✨</button>
+  <p class="footer">မှန်တာကိုရွေးပါနော် 😌 အမှားဖြေရင်လည်း ရယ်ရုံပဲ!</p>
+</section>
+
+<section class="card hidden" id="game">
+  <div class="progressrow"><span id="qcount">မေးခွန်း 1 / 8</span><span id="scorelabel">Score: 0</span></div>
+  <div class="track"><div class="fill" id="progress"></div></div>
+  <p class="question" id="question"></p>
+  <div class="options" id="options"></div>
+  <div class="feedback hidden" id="feedback"></div>
+  <button class="primary hidden" id="next">နောက်တစ်ခု ➜</button>
+</section>
+
+<section class="card hidden top" id="result">
+  <div class="emoji" id="resultemoji">🌷</div>
+  <span class="pill">Su Su San's result</span>
+  <h1 id="hello">ပြီးသွားပြီ!</h1>
+  <div class="resultscore" id="finalscore">0/8</div>
+  <div class="resulttitle" id="resulttitle"></div>
+  <p class="resulttext" id="resulttext"></p>
+  <button class="primary" id="again">ထပ်ဆော့မယ် 🔁</button>
+  <button class="secondary" id="share" style="margin-top:12px">ရလဒ်ကို Copy လုပ်မယ် 📋</button>
+  <p class="footer">Made with a little friendship magic 🍀</p>
+</section>
+</main>
+<script>
+/* You can change the questions and choices here to match your own life. */
+const quiz = [
+ {q:"ငါ့ကို ဘယ်လိုခေါ်တာ အများဆုံးကြားရလဲ?",a:["ငါ့နာမည်/နာမည်ပြောင်","ဆရာမ","မင်းသမီး","အမည်မသိ 😭"],correct:0,why:"ကိုယ့်အချင်းချင်းခေါ်နေကျနာမည်လေးက အလွယ်ဆုံးပဲနော် 💚"},
+ {q:"ငါစိတ်ညစ်နေတဲ့အချိန် ဘာလုပ်ပေးရင် ပိုသဘောကျမလဲ?",a:["နားထောင်ပေးတာ","အတင်းရယ်ခိုင်းတာ","ချက်ချင်းပျောက်သွားတာ","မသိဘူးဟာ 😅"],correct:0,why:"တစ်ခါတလေ အကြံပေးတာထက် နားထောင်ပေးတာလေးက ပိုအရေးကြီးတယ်။"},
+ {q:"ငါတို့နှစ်ယောက် ဘာလုပ်ရင် ပျော်စရာကောင်းမလဲ?",a:["စကားပြောပြီး ရယ်ကြတာ","အိမ်စာပဲလုပ်တာ","တိတ်တိတ်ထိုင်တာ","အိပ်ပျော်သွားတာ"],correct:0,why:"အတူရယ်ရတဲ့အချိန်တွေက ခင်မင်မှုရဲ့အမှတ်တရလေးတွေပဲ။"},
+ {q:"ငါ့အကြောင်း အသစ်သိချင်ရင် ဘာလုပ်သင့်လဲ?",a:["တိုက်ရိုက်မေးကြည့်မယ်","ခန့်မှန်းမယ်","မေးမနေတော့ဘူး","သူများဆီကပဲမေးမယ်"],correct:0,why:"အကောင်းဆုံးနည်းက တိုက်ရိုက်မေးပြီး ပိုသိလာတာပဲ 😆"},
+ {q:"ငါ့ကို ရွေးပေးရမယ့် mood တစ်ခုက?",a:["အေးအေးဆေးဆေး 🌿","အမြဲဒေါသထွက် 😤","အမြဲအိပ်ချင် 😴","စကားလုံးဝမပြော 🤐"],correct:0,why:"ဒီတစ်ခုကတော့ ငါ့ကိုမေးပြီး အတည်ပြုကြည့်နော် 😂"},
+ {q:"ငါနဲ့ အမှတ်တရတစ်ခုလုပ်ရမယ်ဆို ဘာရွေးမလဲ?",a:["ဓာတ်ပုံရိုက်မယ် 📸","အတူစားမယ် 🍰","လျှောက်လည်မယ် 🌈","အားလုံးလုပ်မယ် 💚"],correct:3,why:"တကယ်တော့ အမှတ်တရကောင်းတွေ အများကြီးလုပ်လို့ရတာပေါ့!"},
+ {q:"ငါ့အကြောင်း မသိသေးတာရှိရင်…",a:["မေးပြီးသိအောင်လုပ်မယ်","သိချင်ပေမယ့်မမေးဘူး","ခန့်မှန်းပြီးဆုံးဖြတ်မယ်","လုံးဝစိတ်မဝင်စားဘူး"],correct:0,why:"မေးမြန်းပြီး နားလည်ပေးတာက သူငယ်ချင်းကောင်းတစ်ယောက်ရဲ့အချက်ပဲ။"},
+ {q:"နောက်ဆုံးမေးခွန်း 💌 — ငါတို့သူငယ်ချင်းဖြစ်တာကို ဘယ်လိုမြင်လဲ?",a:["တန်ဖိုးရှိတယ် 💚","ပျော်စရာကောင်းတယ် 🌷","ပိုပြီးရင်းနှီးချင်တယ် ✨","အပေါ်ကအားလုံးပဲ 🥹"],correct:3,why:"အဖြေမှန်တစ်ခုတည်းမရှိပါဘူး။ ကိုယ့်စိတ်ထဲကအမှန်ဆုံးကိုပဲ ရွေးပါနော်။"}
+];
+let order=[],idx=0,score=0,answered=false,playerName="";
+const $=id=>document.getElementById(id);
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+function startGame(){
+ playerName=$("player").value.trim(); order=shuffle(quiz.map((_,i)=>i));idx=0;score=0;
+ $("welcome").classList.add("hidden");$("result").classList.add("hidden");$("game").classList.remove("hidden");renderQuestion();
+}
+function renderQuestion(){
+ answered=false;const item=quiz[order[idx]];
+ $("qcount").textContent=`မေးခွန်း ${idx+1} / ${quiz.length}`;$("scorelabel").textContent=`Score: ${score}`;
+ $("progress").style.width=`${idx/quiz.length*100}%`;$("question").textContent=item.q;
+ $("options").innerHTML="";$("feedback").classList.add("hidden");$("next").classList.add("hidden");
+ item.a.forEach((answer,i)=>{const b=document.createElement("button");b.className="option";b.textContent=String.fromCharCode(65+i)+". "+answer;b.onclick=()=>choose(i,b);$("options").appendChild(b)});
+}
+function choose(choice,btn){
+ if(answered)return;answered=true;const item=quiz[order[idx]];
+ [...$("options").children].forEach((b,i)=>{b.disabled=true;if(i===item.correct)b.classList.add("selected")});
+ const feedback=$("feedback");feedback.classList.remove("hidden");
+ if(choice===item.correct){score++;feedback.textContent="ဟုတ်တယ်! အမှတ်ရပြီ 🎉 "+item.why}
+ else{feedback.textContent="အိုဟို 😆 ဒီတစ်ခါတော့ မတူဘူးနော်။ "+item.why}
+ $("scorelabel").textContent=`Score: ${score}`;$("progress").style.width=`${(idx+1)/quiz.length*100}%`;
+ $("next").textContent=idx===quiz.length-1?"ရလဒ်ကြည့်မယ် 💌":"နောက်တစ်ခု ➜";$("next").classList.remove("hidden");
+}
+function showResult(){
+ $("game").classList.add("hidden");$("result").classList.remove("hidden");
+ $("hello").textContent=playerName?`${playerName} ရေ၊ ပြီးသွားပြီ!`:"ပြီးသွားပြီ!";
+ $("finalscore").textContent=`${score}/${quiz.length}`;
+ let title,txt,emo;
+ if(score>=7){title="ငါ့အကြောင်း တော်တော်သိတာပဲ! 💚";txt="မေးခွန်းတွေကို အများကြီးမှန်တယ်နော်။ Friendship expert လေးပဲ!";emo="🏆"}
+ else if(score>=4){title="သူငယ်ချင်းကောင်းလေး 🌷";txt="ငါ့အကြောင်း တချို့သိပြီးသားပဲ။ နောက်ထပ်စကားပြောရင်း ပိုသိလာကြမယ်နော်။";emo="🌷"}
+ else{title="နောက်တစ်ခေါက် ထပ်စမ်းကြည့် 😝";txt="မပူနဲ့၊ ဂိမ်းက ပျော်ဖို့ပါပဲ။ ငါ့အကြောင်းတွေ မေးရင်း ပိုသိလာလို့ရတယ်။";emo="🍀"}
+ $("resulttitle").textContent=title;$("resulttext").textContent=txt;$("resultemoji").textContent=emo;
+}
+$("start").onclick=startGame;
+$("next").onclick=()=>{if(idx<quiz.length-1){idx++;renderQuestion()}else showResult()};
+$("again").onclick=()=>{$("result").classList.add("hidden");$("welcome").classList.remove("hidden")};
+$("share").onclick=async()=>{const text=`${playerName||"Su Su San"} ရဲ့ Friendship Quiz Result: ${score}/${quiz.length} 🍀`;try{await navigator.clipboard.writeText(text);$("share").textContent="Copy လုပ်ပြီးပြီ 💚"}catch(e){$("resulttext").textContent=text+" — ဒီစာကို ဖိထားပြီး copy လုပ်လို့ရတယ်။"}};
+</script>
+</body>
+</html>
